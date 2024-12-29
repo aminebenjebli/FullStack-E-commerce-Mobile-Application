@@ -1,10 +1,15 @@
+import 'package:ecommerceapp/firebase_options.dart';
 import 'package:ecommerceapp/src/routing/app_route.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-
-void main() {
-  WidgetsFlutterBinding.ensureInitialized();// This line initializes Flutter's binding to the UI toolkit.
+Future<void> main() async {
+  WidgetsFlutterBinding
+      .ensureInitialized(); // This line initializes Flutter's binding to the UI toolkit.
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const ProviderScope(child: MyApp()));
 }
 
@@ -36,9 +41,6 @@ class MyApp extends ConsumerWidget {
           foregroundColor: Colors.white, // foreground (text) color
         ),
       ),
-      );
+    );
   }
 }
-
-
-
