@@ -2,7 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecommerceapp/src/data/firestore_repository.dart';
 import 'package:ecommerceapp/src/data/job.dart';
 import 'package:ecommerceapp/src/routing/app_route.dart';
-import 'package:faker/faker.dart' hide Job;
+import 'package:faker/faker.dart'
+    hide Job; // ignore: avoid_redundant_argument_values
 import 'package:firebase_ui_firestore/firebase_ui_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,7 +11,6 @@ import 'package:go_router/go_router.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
@@ -42,8 +42,15 @@ class JobsListView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final firestoreRepository = ref.watch(firestoreRepositoryProvider);
+    final user = ref.watch(firebaseAuthProvider).currentUser;
     return FirestoreListView<Job>(
-      query: firestoreRepository.jobsQuery(),
+      query: firestoreRepository.jobsQuery(user!.uid),
+      errorBuilder: (context, error, StackTrace) => Center(
+        child: Text(error.toString()),
+      ),
+      emptyBuilder: (context) => const Center(
+        child: Text('No jobs found'),
+      ),
       itemBuilder: (BuildContext context, QueryDocumentSnapshot<Job> doc) {
         final job = doc.data();
         return Dismissible(
@@ -57,6 +64,12 @@ class JobsListView extends ConsumerWidget {
           child: ListTile(
             title: Text(job.title),
             subtitle: Text(job.company),
+            trailing: job.createdAt != null
+                ? Text(
+                    job.createdAt!.toString(),
+                    style: Theme.of(context).textTheme.bodySmall,
+                  )
+                : null,
             onTap: () {
               final user = ref.read(firebaseAuthProvider).currentUser;
               final faker = Faker();

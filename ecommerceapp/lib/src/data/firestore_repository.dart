@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ecommerceapp/src/data/job.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class FirestoreRepository {
@@ -18,28 +17,31 @@ class FirestoreRepository {
 
   // A method to add a new job to Firestore. Create
   Future<void> addJob(String uid, String title, String company) =>
-      _firestore.collection('jobs').add({
-        'uid': uid,
+      _firestore.collection('users/$uid/jobs').add({
         'title': title,
         'company': company,
+        'createdAt': FieldValue.serverTimestamp(),
       });
   // A method to update a job in Firestore. Update
   Future<void> updateJob(
           String uid, String jobId, String title, String company) =>
-      _firestore.doc('jobs/$jobId').update({
-        'uid': uid,
+      _firestore.doc('users/$uid/jobs/$jobId').update({
         'title': title,
         'company': company,
       });
   // A method to delete a job from Firestore. delete
   Future<void> deleteJob(String uid, String jobId) =>
-      _firestore.doc('jobs/$jobId').delete();
+      _firestore.doc('users/$uid/jobs/$jobId').delete();
 
   // A query to fetch all jobs from Firestore. Read
-  Query<Job> jobsQuery() {
-    return _firestore.collection('jobs').withConverter(
-        fromFirestore: (snapshot, _) => Job.fromMap(snapshot.data()!),
-        toFirestore: (job, _) => job.toMap());
+  Query<Job> jobsQuery(String uid) {
+    return _firestore
+        .collection('users/$uid/jobs')
+        .withConverter(
+          fromFirestore: (snapshot, _) => Job.fromMap(snapshot.data()!),
+          toFirestore: (job, _) => job.toMap(),
+        )
+        .orderBy('createdAt', descending: true);
   }
 }
 
