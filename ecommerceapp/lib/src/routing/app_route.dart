@@ -18,6 +18,7 @@ final firebaseAuthProvider = Provider<FirebaseAuth>((ref) {
 
 final goRouterProvider = Provider<GoRouter>((ref) {
   final firebaseAuth = ref.watch(firebaseAuthProvider);
+  
   return GoRouter(
     initialLocation: '/sign-in',
     debugLogDiagnostics: true,
